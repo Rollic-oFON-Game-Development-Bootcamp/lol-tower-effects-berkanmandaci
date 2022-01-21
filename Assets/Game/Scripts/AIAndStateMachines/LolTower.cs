@@ -14,6 +14,7 @@ public enum TowerStates
 public class LolTower : MonoBehaviour
 {
     [SerializeField] private Transform towerTop;
+    [SerializeField] private ParticleSystem fireEffect;
 
     [ReadOnly] public TowerStates currentState;
 
@@ -33,6 +34,8 @@ public class LolTower : MonoBehaviour
 
         if (currentTargetMinion != null)
         {
+            fireEffect.transform.LookAt(currentTargetMinion.transform);
+            fireEffect.Play(); 
             Gizmos.color = Color.yellow;
             Gizmos.DrawLine(towerTop.position, currentTargetMinion.transform.position);
         }
@@ -122,21 +125,25 @@ public class LolTower : MonoBehaviour
         while (currentState == TowerStates.AttackMinion)
         {
             timer += Time.deltaTime;
-
+            
             if (timer >= attackCooldown)
             {
                 if (currentTargetMinion.GetHit())
                 {
+                    // fireEffect.Stop();
                     currentTargetMinion = null;
                     currentState = TowerStates.SeekTarget;
                     continue;
                 }
+               
                 timer -= attackCooldown;
             }
 
             var sqrDistanceToTarget = (currentTargetMinion.transform.position - transform.position).sqrMagnitude;
             if (sqrDistanceToTarget > towerRange * towerRange)
             {
+                // fireEffect.transform.LookAt(currentTargetMinion.transform);
+                // fireEffect.Play(); 
                 currentTargetMinion = null;
                 currentState = TowerStates.SeekTarget;
                 continue;
